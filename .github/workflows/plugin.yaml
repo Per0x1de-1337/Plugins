@@ -84,6 +84,10 @@ jobs:
           name: frontend-bundle
           path: releases/
 
+      - name: Rename Frontend JS File
+        run: |
+          mv releases/kubestellar-cluster-plugin-frontend.js releases/frontend-linux-amd64.js
+
       - name: Download Backend Plugins
         uses: actions/download-artifact@v4.6.2
         with:
@@ -94,7 +98,7 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git add releases/*
-          git commit -m "Upload built artifacts to releases folder [CI]"
+          git commit -m "Upload frontend and backend artifacts to releases folder [CI]" || echo "Nothing to commit"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
