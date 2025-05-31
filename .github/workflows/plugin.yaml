@@ -68,7 +68,7 @@ jobs:
         continue-on-error: false # Exit on error as requested
 
       - name: Upload Backend Binary for ${{ matrix.goos }}-${{ matrix.goarch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: backend-binary-${{ matrix.goos }}-${{ matrix.goarch }}
           path: backend/kubestellar-cluster-plugin-${{ matrix.goos }}-${{ matrix.goarch }}.${{ matrix.goos == 'windows' && 'dll' || 'so' }}
@@ -89,7 +89,7 @@ jobs:
           mkdir -p releases
 
       - name: Download Frontend Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.6.2
         with:
           name: frontend-bundle
           path: releases/
@@ -120,4 +120,4 @@ jobs:
           git commit -m "Upload built artifacts to releases folder [CI]"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
