@@ -79,7 +79,7 @@ jobs:
         run: mkdir -p releases
 
       - name: Download Frontend Artifact
-        uses: actions/download-artifact@v4.6.2
+        uses: actions/download-artifact@v4.3.0
         with:
           name: frontend-bundle
           path: releases/
@@ -89,7 +89,7 @@ jobs:
           mv releases/kubestellar-cluster-plugin-frontend.js releases/frontend-linux-amd64.js
 
       - name: Download Backend Plugins
-        uses: actions/download-artifact@v4.6.2
+        uses: actions/download-artifact@v4.3.0
         with:
           path: releases/
 
