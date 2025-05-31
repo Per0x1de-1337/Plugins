@@ -1,6 +1,5 @@
 name: Build and Upload KubeStellar Cluster Plugin
 
-# Trigger the workflow on push to the main branch
 on:
   push:
     branches:
@@ -27,28 +26,22 @@ jobs:
       - name: Build Frontend Bundle with Webpack
         run: |
           cd frontend
-          webpack --mode=production --config webpack.config.js
-        continue-on-error: false # Exit on error as requested
+          npx webpack --mode=production --config webpack.config.js
+        continue-on-error: false
 
       - name: Upload Frontend Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-bundle
           path: frontend/dist/kubestellar-cluster-plugin-frontend.js
 
   build_backend:
-    name: Build Backend Binaries for Multi-Platform
+    name: Build Backend Plugin for Linux
     runs-on: ubuntu-latest
-    needs: build_frontend # Run after frontend build
+    needs: build_frontend
     strategy:
       matrix:
-        goos: [linux, windows, darwin]
-        goarch: ["386", amd64, arm64]
-        exclude:
-          - goarch: "386"
-            goos: darwin
-          - goarch: arm64
-            goos: windows
+        goarch: [amd64, arm64]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -58,20 +51,16 @@ jobs:
         with:
           go-version: 1.21
 
-      - name: Build Backend Binary for ${{ matrix.goos }}-${{ matrix.goarch }}
+      - name: Build Backend Plugin for linux-${{ matrix.goarch }}
         run: |
           cd backend
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -buildmode=plugin -o kubestellar-cluster-plugin-${{ matrix.goos }}-${{ matrix.goarch }}.so main.go
-          if [ "${{ matrix.goos }}" = "windows" ]; then
-            mv kubestellar-cluster-plugin-${{ matrix.goos }}-${{ matrix.goarch }}.so kubestellar-cluster-plugin-${{ matrix.goos }}-${{ matrix.goarch }}.dll
-          fi
-        continue-on-error: false # Exit on error as requested
+          GOOS=linux GOARCH=${{ matrix.goarch }} go build -buildmode=plugin -o kubestellar-cluster-plugin-linux-${{ matrix.goarch }}.so main.go
 
-      - name: Upload Backend Binary for ${{ matrix.goos }}-${{ matrix.goarch }}
-        uses: actions/upload-artifact@v4.6.2
+      - name: Upload Backend Plugin for linux-${{ matrix.goarch }}
+        uses: actions/upload-artifact@v3
         with:
-          name: backend-binary-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: backend/kubestellar-cluster-plugin-${{ matrix.goos }}-${{ matrix.goarch }}.${{ matrix.goos == 'windows' && 'dll' || 'so' }}
+          name: backend-plugin-linux-${{ matrix.goarch }}
+          path: backend/kubestellar-cluster-plugin-linux-${{ matrix.goarch }}.so
 
   upload_to_releases_folder:
     name: Upload Artifacts to Releases Folder
@@ -85,8 +74,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Releases Folder if Not Exists
-        run: |
-          mkdir -p releases
+        run: mkdir -p releases
 
       - name: Download Frontend Artifact
         uses: actions/download-artifact@v4.6.2
@@ -94,23 +82,10 @@ jobs:
           name: frontend-bundle
           path: releases/
 
-      - name: Download Backend Binaries
-        run: |
-          # Download all backend binaries
-          for os in linux windows darwin; do
-            for arch in 386 amd64 arm64; do
-              if [ "$os" = "darwin" ] && [ "$arch" = "386" ]; then continue; fi
-              if [ "$os" = "windows" ] && [ "$arch" = "arm64" ]; then continue; fi
-              artifact_name="backend-binary-$os-$arch"
-              echo "Downloading $artifact_name"
-              if curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -o "releases/kubestellar-cluster-plugin-$os-$arch.${os == 'windows' && 'dll' || 'so'}" \
-                "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_name/zip"; then
-                echo "Downloaded $artifact_name"
-              fi
-            done
-          done
-        continue-on-error: false
+      - name: Download Backend Plugins
+        uses: actions/download-artifact@v4.6.2
+        with:
+          path: releases/
 
       - name: Commit and Push to Releases Folder
         run: |
@@ -120,4 +95,4 @@ jobs:
           git commit -m "Upload built artifacts to releases folder [CI]"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
