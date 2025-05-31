@@ -57,7 +57,7 @@ jobs:
           GOOS=linux GOARCH=${{ matrix.goarch }} go build -buildmode=plugin -o kubestellar-cluster-plugin-linux-${{ matrix.goarch }}.so main.go
 
       - name: Upload Backend Plugin for linux-${{ matrix.goarch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: backend-plugin-linux-${{ matrix.goarch }}
           path: backend/kubestellar-cluster-plugin-linux-${{ matrix.goarch }}.so
