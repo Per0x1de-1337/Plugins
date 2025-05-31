@@ -99,6 +99,8 @@ jobs:
           git config --global user.email 'action@github.com'
           git add releases/*
           git commit -m "Upload frontend and backend artifacts to releases folder [CI]" || echo "Nothing to commit"
+          git remote set-url origin https://x-access-token:${TOKEN_GITHUB}@github.com/Per0x1de-1337/Plugins.git
           git push origin main
+
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
