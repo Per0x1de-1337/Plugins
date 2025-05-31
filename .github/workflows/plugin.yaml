@@ -29,7 +29,7 @@ jobs:
           npx webpack --mode=production --config webpack.config.js
 
       - name: Upload Frontend Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: frontend-bundle
           path: frontend/dist/kubestellar-cluster-plugin-frontend.js
@@ -59,7 +59,7 @@ jobs:
           CGO_ENABLED=1 GOOS=linux GOARCH=${{ matrix.goarch }} go build -buildmode=plugin -o kubestellar-cluster-plugin-linux-${{ matrix.goarch }}.so main.go
 
       - name: Upload Backend Plugin for linux-${{ matrix.goarch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: backend-plugin-linux-${{ matrix.goarch }}
           path: backend/kubestellar-cluster-plugin-linux-${{ matrix.goarch }}.so
@@ -79,13 +79,13 @@ jobs:
         run: mkdir -p releases
 
       - name: Download Frontend Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.6.2
         with:
           name: frontend-bundle
           path: releases/
 
       - name: Download Backend Plugins
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.6.2
         with:
           path: releases/
 
