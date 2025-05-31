@@ -31,7 +31,7 @@ jobs:
         continue-on-error: false # Exit on error as requested
 
       - name: Upload Frontend Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: frontend-bundle
           path: frontend/dist/kubestellar-cluster-plugin-frontend.js
