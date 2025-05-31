@@ -1,0 +1,27 @@
+{
+  "name": "kubestellar-cluster-plugin-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for KubeStellar Cluster Management Plugin",
+  "main": "dist/kubestellar-cluster-plugin-frontend.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack serve --open"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.0",
+    "axios": "^1.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.1.6",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.2"
+  }
+}

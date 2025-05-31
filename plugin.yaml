@@ -1,0 +1,33 @@
+id: kubestellar-cluster-plugin
+name: KubeStellar Cluster Management
+version: 1.0.0
+description: Plugin for cluster onboarding and detachment in KubeStellar
+author: Per0x1de-1337
+compatibility:
+  kubestellar: ">=0.27.2"
+  go: ">=1.21"
+endpoints:
+  - path: /onboard
+    method: POST
+    handler: OnboardClusterHandler
+  - path: /detach
+    method: POST
+    handler: DetachClusterHandler
+  - path: /status
+    method: GET
+    handler: GetClusterStatusHandler
+ui_components:
+  - name: OnboardCluster
+    route: /clusters/onboard
+    component: OnboardForm
+  - name: DetachCluster
+    route: /clusters/detach
+    component: DetachForm
+dependencies:
+  - kubectl
+  - clusteradm
+permissions:
+  - cluster.read
+  - cluster.write
+  - configmap.read
+  - configmap.write
