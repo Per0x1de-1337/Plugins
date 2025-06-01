@@ -420,8 +420,58 @@ func OnboardCluster(kubeconfigData []byte, clusterName string) error {
 	return nil
 }
 
-func waitForManagedCluster(hubClientset *kubernetes.Clientset, clusterName string) any {
-	panic("unimplemented")
+// waitForManagedCluster waits for the managed cluster to be created and accepts it
+func waitForManagedCluster(clientset *kubernetes.Clientset, clusterName string) error {
+	timeout := time.After(5 * time.Minute)
+	tick := time.Tick(10 * time.Second)
+
+	log.Printf("Waiting for managed cluster %s to be created...", clusterName)
+	LogOnboardingEvent(clusterName, "Waiting", "Waiting for managed cluster resource to be created")
+
+	for {
+		select {
+		case <-timeout:
+			LogOnboardingEvent(clusterName, "Error", "Timeout waiting for managed cluster")
+			return fmt.Errorf("timeout waiting for managed cluster")
+		case <-tick:
+			// Check if the managed cluster exists
+			result := clientset.RESTClient().Get().
+				AbsPath("/apis/cluster.open-cluster-management.io/v1").
+				Resource("managedclusters").
+				Name(clusterName).
+				Do(context.TODO())
+
+			err := result.Error()
+			if err == nil {
+				log.Printf("Managed cluster %s created", clusterName)
+				LogOnboardingEvent(clusterName, "Created", "Managed cluster resource created successfully")
+
+				// Attempt to accept the managed cluster by setting hubAcceptsClient to true
+				acceptPatch := []byte(`{"spec":{"hubAcceptsClient":true}}`)
+
+				patchResult := clientset.RESTClient().Patch(types.MergePatchType).
+					AbsPath("/apis/cluster.open-cluster-management.io/v1").
+					Resource("managedclusters").
+					Name(clusterName).
+					Body(acceptPatch).
+					Do(context.TODO())
+
+				if patchErr := patchResult.Error(); patchErr != nil {
+					log.Printf("Warning: Failed to accept managed cluster: %v", patchErr)
+					LogOnboardingEvent(clusterName, "Warning", fmt.Sprintf("Failed to accept managed cluster: %v", patchErr))
+					// Continue anyway as it might already be accepted by clusteradm or auto-approval
+				} else {
+					log.Printf("Managed cluster %s accepted", clusterName)
+					LogOnboardingEvent(clusterName, "Accepted", "Managed cluster accepted successfully")
+				}
+
+				return nil
+			}
+
+			// Continue waiting if not found
+			log.Printf("Waiting for managed cluster %s to be created...", clusterName)
+		}
+	}
 }
 
 // LogOnboardingEvent adds an event to the log and broadcasts it to all connected clients
