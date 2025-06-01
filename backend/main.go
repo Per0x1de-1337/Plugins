@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/handlers"
+
 	"github.com/Per0x1de-1337/pluginapi"
 
 	"github.com/gin-gonic/gin"
@@ -26,12 +27,13 @@ func NewPlugin() pluginapi.KubestellarPlugin {
 			Name:        "KubeStellar Cluster Management",
 			Version:     "1.0.0",
 			Description: "Plugin for cluster onboarding and detachment in KubeStellar",
-			Author:      "CNCF LFX Mentee",
+			Author:      "Peroxide",
 		},
 		handlers: map[string]gin.HandlerFunc{
-			"/onboard": handlers.OnboardClusterHandler,
-			"/detach":  handlers.DetachClusterHandler,
-			"/status":  handlers.GetClusterStatusHandler,
+			"/onboard":   handlers.OnboardClusterHandler,
+			"/detach":    handlers.DetachClusterHandler,
+			"/status":    handlers.GetClusterStatusHandler,
+			"/available": handlers.GetAvailableClustersHandler,
 		},
 	}
 }
@@ -43,6 +45,7 @@ func (p *Plugin) Initialize(config map[string]interface{}) error {
 	p.router.POST("/onboard", p.handlers["/onboard"])
 	p.router.POST("/detach", p.handlers["/detach"])
 	p.router.GET("/status", p.handlers["/status"])
+	p.router.GET("/available", p.handlers["/available"])
 	// Configuration can be processed here if needed (e.g., API keys, cluster settings)
 	return nil
 }
