@@ -63,9 +63,9 @@ func DetachClusterHandler(c *gin.Context) {
 	}
 
 	// Check if the cluster exists in the OCM hub
-	// mutex.RLock()
+	mutex.Lock()
 	status, exists := clusterStatuses[clusterName]
-	// mutex.RUnlock()
+	mutex.Unlock()
 
 	if !exists {
 		// Check directly with the OCM hub
@@ -254,9 +254,9 @@ func GetDetachmentLogsHandler(c *gin.Context) {
 	events := GetOnboardingEvents(clusterName)
 
 	// Get current status
-	// mutex.RLock()
+	mutex.Lock()
 	status, exists := clusterStatuses[clusterName]
-	// mutex.RUnlock()
+	mutex.Unlock()
 
 	if !exists {
 		// Check if we have logs even though the cluster is no longer in our status map
@@ -327,9 +327,9 @@ func HandleDetachmentWebSocket(c *gin.Context) {
 	}
 
 	// Get current status
-	// mutex.RLock()
+	mutex.Lock()
 	status, exists := clusterStatuses[clusterName]
-	// mutex.RUnlock()
+	mutex.Unlock()
 
 	// Send status update
 	statusEvent := WebSocketEvent{
@@ -398,9 +398,9 @@ func BroadcastDetachmentEvent(clusterName, status, message string) {
 		Timestamp:   time.Now(),
 	}
 
-	wsClientMutex.RLock()
+	wsClientMutex.Lock()
 	clients, exists := wsClients[clusterName]
-	wsClientMutex.RUnlock()
+	wsClientMutex.Unlock()
 
 	if !exists {
 		return
@@ -429,9 +429,9 @@ func BroadcastStatusChange(clusterName, status string) {
 		Timestamp:   time.Now(),
 	}
 
-	wsClientMutex.RLock()
+	wsClientMutex.Lock()
 	clients, exists := wsClients[clusterName]
-	wsClientMutex.RUnlock()
+	wsClientMutex.Unlock()
 
 	if !exists {
 		return
