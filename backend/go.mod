@@ -69,4 +69,4 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
-replace github.com/Per0x1de-1337/pluginapi => /root/plugins/Plugins/backend/pluginapi
+replace github.com/Per0x1de-1337/pluginapi => /root/pluginapi
