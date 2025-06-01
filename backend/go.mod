@@ -3,6 +3,7 @@ module backend
 go 1.24.2
 
 require (
+	github.com/Per0x1de-1337/pluginapi v0.0.0-00010101000000-000000000000
 	github.com/gin-gonic/gin v1.10.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	k8s.io/api v0.33.1
@@ -67,3 +68,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.6.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
+
+replace github.com/Per0x1de-1337/pluginapi => /home/peroxide/Plugins/temp/Plugins/backend/pluginapi
