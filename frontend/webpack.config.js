@@ -1,31 +1,39 @@
-const path = require("path");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: "./src/index.ts",
-  mode: "production",
+  entry: './src/main.jsx',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+    clean: true, // clear dist/ before build
+  },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: "ts-loader",
+        test: /\.jsx?$/,
         exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
     ],
   },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html', // Will inject bundle.js
+    }),
+  ],
+  devServer: {
+    static: './dist',
+    port: 3002,
   },
-  output: {
-    filename: "kubestellar-cluster-plugin-frontend.js",
-    path: path.resolve(__dirname, "dist"),
-    library: "KubeStellarClusterPlugin",
-    libraryTarget: "umd",
-    globalObject: "this",
-  },
-  externals: {
-    react: "React",
-    "react-dom": "ReactDOM",
-    "@mui/material": "MaterialUI",
-    axios: "axios",
-  },
+  mode: 'development',
 };
